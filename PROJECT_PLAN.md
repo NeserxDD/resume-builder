@@ -62,15 +62,15 @@ Skills change how the agent behaves for the *entire* project, so they need to be
 
    **b) Frontend Design** (Anthropic's skill — pushes the agent toward a deliberate, distinctive UI instead of generic "AI slop" layouts. Directly relevant since this app is UI-heavy: template pickers, live previews, a multi-step form):
    ```bash
-   npx skills add anthropics/skills --skill frontend-design --agent opencode
+   npx skills add anthropics/skills --skill frontend-design --agent opencode --yes
    ```
 
-   **c) React Best Practices** (Vercel Engineering's performance/pattern rules for React + Next.js — waterfalls, bundle size, re-renders, server/client boundary. Matches the Next.js 15 stack exactly):
+   **c) React Best Practices** (Vercel Engineering's performance/pattern rules for React + Next.js — waterfalls, bundle size, re-renders, server/client boundary. The current skill name in the repository is `vercel-react-best-practices` and it matches the Next.js 15 stack exactly):
    ```bash
-   npx skills add vercel-labs/agent-skills --skill react-best-practices --agent opencode
+   npx skills add vercel-labs/agent-skills --skill vercel-react-best-practices --agent opencode --yes
    ```
 
-   Confirm all three loaded: ask OpenCode `use skill tool to list skills` — you should see `frontend-design`, `react-best-practices`, and the superpowers skill set (brainstorming, writing-plans, test-driven-development, etc.) alongside the project's own `add-resume-template` skill.
+   Confirm all three loaded: ask OpenCode `use skill tool to list skills` — you should see `frontend-design`, `vercel-react-best-practices`, and the superpowers skill set (brainstorming, writing-plans, test-driven-development, etc.) alongside the project's own `add-resume-template` skill when it is added.
 
 3. **Only after that** — run `/init` in OpenCode to let it review the repo, then start planning the build (roadmap, folder structure, env setup) itself from this spec.
 
