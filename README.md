@@ -3,8 +3,8 @@
 Resume Builder helps people create one reusable profile, then shape it into
 focused professional resumes. The current MVP foundation includes the Next.js
 app shell, Supabase auth boundaries, Prisma data model, profile wizard, resume
-CRUD, three template metadata definitions, live screen previews, and a
-selectable-text PDF route.
+CRUD with per-resume section/entry selection, seven template implementations,
+live screen previews, highlight-style options, and selectable-text PDF export.
 
 Read [`PROJECT_PLAN.md`](./PROJECT_PLAN.md) for the product scope and agreed
 architecture decisions. Read [`AGENTS.md`](./AGENTS.md) for repository-specific
@@ -43,6 +43,7 @@ npx prisma generate
 ## Current MVP Direction
 
 - Authentication: email/password and Google OAuth through Supabase
-- Data model: profile defaults are copied into each new resume
-- Templates: ATS-Friendly, Modern Professional, and Minimalist
-- Deferred: photo upload, share links, AI assistance, and additional templates
+- Data model: profile defaults are copied into each new resume, with per-resume section and entry selection
+- Templates: ATS-Friendly, Modern Professional, Minimalist, Harvard / Traditional, Classic Tech, Awesome CV (optional photo), Two-Column (optional photo)
+- Photos: uploaded per session for photo-capable templates only — never stored in the database; included in a PDF export only when the editor sends it with the request
+- Deferred: photo persistence, share links, AI assistance, and additional templates

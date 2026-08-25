@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { prisma } from "@/lib/db/prisma";
-import { normalizeContent, resumePatchSchema } from "@/lib/resume/schema";
+import { attachSelection, resumePatchSchema, splitSelection } from "@/lib/resume/schema";
 import { createClient } from "@/lib/supabase/server";
 
 async function getUser() {
@@ -21,7 +21,19 @@ export async function GET(
   const resume = await prisma.resume.findFirst({ where: { id, userId: user.id } });
   if (!resume) return NextResponse.json({ error: "Resume not found." }, { status: 404 });
 
-  return NextResponse.json({ resume: { ...resume, content: normalizeContent(resume.content as Parameters<typeof normalizeContent>[0]) } });
+  const { content, selection } = splitSelection(resume.content);
+
+  return NextResponse.json({
+    resume: {
+      id: resume.id,
+      title: resume.title,
+      templateId: resume.templateId,
+      content,
+      selection,
+      createdAt: resume.createdAt,
+      updatedAt: resume.updatedAt,
+    },
+  });
 }
 
 export async function PATCH(
@@ -40,9 +52,20 @@ export async function PATCH(
   const existing = await prisma.resume.findFirst({ where: { id, userId: user.id } });
   if (!existing) return NextResponse.json({ error: "Resume not found." }, { status: 404 });
 
+  const { content, selection: existingSelection } = splitSelection(existing.content);
+  const nextContent = result.data.content ?? content;
+  const nextSelection = result.data.selection ?? existingSelection;
+  const payload = result.data.content || result.data.selection
+    ? attachSelection(nextContent, nextSelection)
+    : undefined;
+
   const resume = await prisma.resume.update({
     where: { id: existing.id },
-    data: result.data,
+    data: {
+      ...(result.data.title ? { title: result.data.title } : {}),
+      ...(result.data.templateId ? { templateId: result.data.templateId } : {}),
+      ...(payload ? { content: payload } : {}),
+    },
     select: { id: true, title: true, templateId: true, updatedAt: true },
   });
 

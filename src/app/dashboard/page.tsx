@@ -63,17 +63,17 @@ export default async function DashboardPage() {
             <h2 className="display-text mt-6 text-3xl tracking-[-0.04em]">{profile ? "Keep your foundation current." : "Build your reusable profile."}</h2>
             <p className="mt-4 max-w-sm text-sm leading-6 text-[var(--ink-muted)]">{profile ? "Edit your source information before creating another tailored resume." : "Add your experience once so every future resume starts from solid ground."}</p>
           </Link>
-          <Link className="block border border-dashed border-[var(--line)] p-6 transition-colors hover:border-[var(--ink)] sm:p-8" href={profile ? "/resumes/new" : "/profile"}>
+          <Link className="block border border-dashed border-[var(--line)] p-6 transition-colors hover:border-[var(--ink)] sm:p-8" href="/resumes/new">
             <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-[var(--ink-muted)]">Your resumes</p>
             <p className="mt-8 text-4xl font-medium tracking-[-0.05em]">{resumes.length}</p>
-            <p className="mt-2 text-sm leading-6 text-[var(--ink-muted)]">{profile ? "Create a new layout from your profile." : "Finish your profile to create your first resume."}</p>
+            <p className="mt-2 text-sm leading-6 text-[var(--ink-muted)]">Choose the sections you want and pick a layout — your profile is just a starting point.</p>
           </Link>
         </div>
         <div className="mt-12 flex items-end justify-between gap-4 border-b border-[var(--line)] pb-4">
           <div>
             <p className="eyebrow"><span className="text-[var(--signal)]">library</span> Saved resumes</p>
           </div>
-          {profile ? <Link className="button-primary" href="/resumes/new">New resume <span aria-hidden="true">↗</span></Link> : null}
+          {<Link className="button-primary" href="/resumes/new">New resume <span aria-hidden="true">↗</span></Link>}
         </div>
         {resumes.length ? (
           <div className="resume-list">

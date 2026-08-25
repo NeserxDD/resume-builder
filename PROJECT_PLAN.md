@@ -14,18 +14,30 @@ The first release will focus on a small, complete core product rather than
 shipping every planned feature at once.
 
 - **MVP scope:** authentication, reusable profile, resume dashboard CRUD, live
-  preview, three templates, and selectable-text PDF export.
-- **MVP templates:** ATS-Friendly, Modern Professional, and Minimalist.
+  preview, four templates, and selectable-text PDF export.
+- **MVP templates:** ATS-Friendly, Modern Professional, Minimalist, and
+  Harvard / Traditional.
 - **MVP authentication:** email/password and Google OAuth. GitHub OAuth is
   deferred.
-- **Resume data model:** copy-on-create. A new resume snapshots the profile;
-  later edits belong to that resume and do not change the shared profile.
-- **Photo support:** deferred from the MVP. No photo upload or Storage setup is
-  needed initially.
+- **Resume data model:** a single **universal data model** shared by every
+  template. Each resume stores a snapshot of the sections and entries the user
+  selected from their reusable profile (`selectedSections` + `selectedEntries`
+  + copied content). Later edits belong to that resume and do not change the
+  profile.
+- **Template system:** templates are pure presentation. They control section
+  order, which sections render, typography, spacing, layout, colors, alignment,
+  whether photos are supported, and the PDF rendering. They do **not** define
+  their own data schema.
+- **Section selection:** users choose the sections and individual entries (jobs,
+  schools, projects…) that go into a specific resume. Templates that cannot
+  render the chosen sections are filtered out of the picker.
+- **Photo support:** photo data lives in the universal model, but only
+  templates that declare `supportsPhoto: true` render it. Deferred from MVP:
+  photo upload itself.
 - **PDF strategy:** use a shared data/rendering model with a screen component
   and matching `@react-pdf/renderer` component for each template.
-- **Deferred features:** share links, AI assistance, photo upload, Harvard,
-  Stanford, and Two-Column templates, cover letters, resume scoring, and
+- **Deferred features:** share links, AI assistance, photo upload, Stanford,
+  and Two-Column templates, cover letters, resume scoring, and
   internationalization.
 - **App design:** minimalist modern product UI with deliberate typography,
   calm neutrals, and enough visual character to avoid a generic plain SaaS
@@ -105,21 +117,23 @@ The core of the product: one set of resume content, rendered into any of several
 | Layout | What it's for | Sections | Photo | ATS-safe |
 |---|---|---|---|---|
 | **ATS-Friendly** | Applying through online portals / applicant tracking systems | Personal info, summary, experience, education, skills (projects/certs optional) | No | Yes — single column, no tables, no icons, standard headers |
-| **Harvard / Traditional** | Conservative industries (law, finance, academia-adjacent) | Same core sections, often no summary — bullets speak for themselves | No | Mostly |
+| **Harvard / Traditional** | Conservative industries (law, finance, academia-adjacent) | Education, experience, leadership & activities, grouped skills (thesis/coursework/study abroad) | No | Mostly |
 | **Stanford / Academic** | Academic, research, or PhD-adjacent applications | Adds publications, research, honors/awards; core sections too | Often yes | No — richer formatting |
 | **Modern Professional** | General private-sector roles | Core sections, contemporary typography/spacing | Optional | Usually |
 | **Two-Column** | Roles wanting a scannable, visually organized resume | Sidebar (contact/skills/photo) + main column (experience/education) | Yes, in sidebar | No — multi-column layouts confuse ATS parsers |
 | **Minimalist** | Anyone wanting maximum focus on content, minimum decoration | Only the essentials, even if the user filled in more | No | Yes |
 | *(+ room to add more later)* | | | | |
 
-**Key product rule:** these layouts are not interchangeable skins. Each one has an opinion about which sections it shows and whether it supports a photo — see § 3 for how that's modeled. A user with no projects shouldn't see an empty "Projects" heading on *any* layout, and a photo should only ever appear on layouts designed to show one.
+**Key product rule:** these layouts are not interchangeable skins. Each one has an opinion about which sections it shows and whether it supports a photo — see § 3 for how that's modeled. A user with no projects shouldn't see an empty "Projects" heading on *any* layout, and a photo should only ever appear on layouts designed to show one. Templates only receive the sections/entries the user selected for that resume.
 
 ### 2.2 Reusable profile ("fill in once, use everywhere")
 
-- The user fills in their information **one time** — personal info, summary, work experience, education, skills, projects, certifications, and an optional photo.
-- Every resume the user creates pulls from that same profile, rendered through whichever layout they pick.
-- Switching layouts on an existing resume should feel instant — same data, new look, no re-entry.
-- A resume can optionally diverge from the base profile later (e.g. a trimmed-down summary for one specific application) without touching the shared profile — but the profile stays the single source of truth by default.
+- The user fills in their information **one time** — personal info, summary, work experience, education, skills, projects, and certifications.
+- When creating a resume, the user picks **which sections** and **which individual entries** go into that resume. Only the chosen data is copied into the resume.
+- Templates that can't render the chosen sections are hidden from the template picker, so the user never silently loses selected data.
+- Editing a resume never changes the profile; the profile stays the single reusable source of truth.
+- A resume can store template-specific fields (e.g. thesis, coursework, study abroad) and grouped skills without touching the shared profile.
+- The profile is optional — a resume can be started empty and filled in directly in the editor.
 
 ### 2.3 Account system
 
@@ -160,11 +174,12 @@ This is explicitly the **last** feature to build if time/complexity runs short �
 
 ## 3. How the multi-layout system actually works
 
-Because layouts aren't interchangeable skins (§ 2.1), each layout needs to declare its own capabilities, and the rendering logic needs to read from that declaration rather than assuming every layout shows every field.
+There is **one universal resume data model**, shared by every template. Templates are pure presentation: they control ordering, styling, and which sections they are designed to render.
 
 ```ts
 type SectionKey = 'summary' | 'experience' | 'education' | 'skills'
-  | 'projects' | 'certifications' | 'publications' | 'awards';
+  | 'projects' | 'certifications' | 'leadership' | 'publications'
+  | 'research' | 'teaching' | 'awards';
 
 interface TemplateMeta {
   id: string;
@@ -176,6 +191,34 @@ interface TemplateMeta {
 }
 ```
 
-Each layout renders (both on-screen and in the exported PDF) by looping over its own `sections` list and skipping any section that's empty in the user's data — this one pattern handles "no projects," "no summary," and "this layout doesn't support publications" all at once, instead of needing special-case logic per layout. Photo rendering is gated on `supportsPhoto`, not on whether the user happens to have uploaded one.
+**Universal content** (`ResumeContent`) holds every section:
 
-The profile itself needs one field beyond the obvious ones: an optional `photoUrl`, skippable during setup, shown only by layouts that support it.
+- personal info (including optional `photoUrl`), summary, experience, education,
+  skills (flat list + optional named groups like Technical/Languages/Laboratory/Interests),
+  projects, certifications, leadership & activities, publications, research,
+  teaching, awards.
+
+**Per-resume selection** (`ResumeSelection`) records what the user chose for this resume:
+
+```ts
+type ResumeSelection = {
+  sections: SectionKey[];                  // which sections are on this resume
+  entries: Partial<Record<SectionKey, string[]>>; // which entries per section (ids)
+};
+```
+
+**Rendering rule:** a resume renders `TemplateMeta.sections ∩ ResumeSelection.sections`,
+further filtered to sections that actually have content — this one pattern handles
+"no projects," "no summary," and "this layout doesn't support publications" at once,
+instead of special-casing each layout. Photo rendering is gated on `supportsPhoto`,
+not on whether the user happened to upload one. Screen preview and the exported PDF
+render from the exact same data and selection.
+
+**Snapshot behavior:** on create, the server copies only the selected sections and
+entries out of the profile into the resume. The selection is stored alongside the
+content JSON (no schema change required), and legacy resumes without a stored
+selection render all of their template's supported sections.
+
+**LaTeX as reference:** each template folder keeps its `.tex` design source as the
+authoritative spec, but the app renders through a shared internal model — LaTeX is
+never compiled at runtime.

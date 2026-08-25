@@ -1,7 +1,14 @@
 import { NextResponse } from "next/server";
 
 import { prisma } from "@/lib/db/prisma";
-import { normalizeContent, resumeRequestSchema } from "@/lib/resume/schema";
+import {
+  attachSelection,
+  emptyResumeContent,
+  filterContentBySelection,
+  normalizeContent,
+  resumeRequestSchema,
+  splitSelection,
+} from "@/lib/resume/schema";
 import type { ResumeContentInput } from "@/lib/resume/schema";
 import { createClient } from "@/lib/supabase/server";
 
@@ -43,20 +50,24 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Resume details are not valid." }, { status: 400 });
   }
 
-  const profile = await prisma.profile.findUnique({ where: { userId: user.id } });
-  if (!profile) {
-    return NextResponse.json({ error: "Create your profile before making a resume." }, { status: 400 });
-  }
+  let selection = result.data.selection;
 
-  let content = {
-    personalInfo: profile.personalInfo,
-    summary: profile.summary ?? "",
-    experience: profile.experience,
-    education: profile.education,
-    skills: profile.skills,
-    projects: profile.projects,
-    certifications: profile.certifications,
-  } as ResumeContentInput;
+  let content: ResumeContentInput = emptyResumeContent();
+
+  const profile = await prisma.profile.findUnique({ where: { userId: user.id } });
+  if (profile) {
+    content = normalizeContent({
+      ...emptyResumeContent(),
+      personalInfo: profile.personalInfo,
+      summary: profile.summary ?? "",
+      experience: profile.experience,
+      education: profile.education,
+      skills: profile.skills,
+      skillGroups: profile.skillGroups ?? [],
+      projects: profile.projects,
+      certifications: profile.certifications,
+    } as ResumeContentInput);
+  }
 
   if (result.data.sourceId) {
     const source = await prisma.resume.findFirst({
@@ -65,15 +76,19 @@ export async function POST(request: Request) {
     });
 
     if (!source) return NextResponse.json({ error: "Source resume not found." }, { status: 404 });
-    content = normalizeContent(source.content as ResumeContentInput);
+    const split = splitSelection(source.content);
+    content = split.content;
+    if (!selection) selection = split.selection;
   }
+
+  if (selection) content = filterContentBySelection(content, selection);
 
   const resume = await prisma.resume.create({
     data: {
       userId: user.id,
       title: result.data.title,
       templateId: result.data.templateId,
-      content: normalizeContent(content),
+      content: attachSelection(content, selection),
     },
     select: { id: true, title: true, templateId: true },
   });

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { prisma } from "@/lib/db/prisma";
-import { normalizeContent, resumeContentSchema } from "@/lib/resume/schema";
+import { emptyResumeContent, normalizeContent, resumeContentSchema } from "@/lib/resume/schema";
 import type { ResumeContentInput } from "@/lib/resume/schema";
 import { createClient } from "@/lib/supabase/server";
 
@@ -9,6 +9,19 @@ async function getUser() {
   const supabase = await createClient();
   const { data } = await supabase.auth.getUser();
   return data.user;
+}
+
+function coreSections(content: ResumeContentInput) {
+  return {
+    personalInfo: content.personalInfo,
+    summary: content.summary,
+    experience: content.experience,
+    education: content.education,
+    skills: content.skills,
+    skillGroups: content.skillGroups,
+    projects: content.projects,
+    certifications: content.certifications,
+  };
 }
 
 export async function GET() {
@@ -22,11 +35,13 @@ export async function GET() {
 
   return NextResponse.json({
     profile: normalizeContent({
+      ...emptyResumeContent(),
       personalInfo: profile.personalInfo,
       summary: profile.summary ?? "",
       experience: profile.experience,
       education: profile.education,
       skills: profile.skills,
+      skillGroups: profile.skillGroups ?? [],
       projects: profile.projects,
       certifications: profile.certifications,
     } as ResumeContentInput),
@@ -48,7 +63,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const content = result.data;
+  const stored = coreSections(result.data);
 
   await prisma.user.upsert({
     where: { id: user.id },
@@ -60,10 +75,10 @@ export async function POST(request: Request) {
     where: { userId: user.id },
     create: {
       userId: user.id,
-      ...content,
+      ...stored,
     },
     update: {
-      ...content,
+      ...stored,
     },
   });
 

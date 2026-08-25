@@ -27,6 +27,7 @@ model Profile {
   experience     Json
   education      Json
   skills         Json
+  skillGroups    Json
   projects       Json
   certifications Json
   createdAt      DateTime @default(now())

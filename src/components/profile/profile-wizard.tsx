@@ -7,26 +7,11 @@ import { useFieldArray, useForm } from "react-hook-form";
 import type { FieldPath } from "react-hook-form";
 import { useRouter } from "next/navigation";
 
-import { resumeContentSchema } from "@/lib/resume/schema";
+import { resumeContentSchema, emptyResumeContent } from "@/lib/resume/schema";
 import type { ResumeContentInput } from "@/lib/resume/schema";
+import { HighlightsField } from "@/components/resumes/highlights-field";
 
-const emptyContent: ResumeContentInput = {
-  personalInfo: {
-    fullName: "",
-    headline: "",
-    email: "",
-    phone: "",
-    location: "",
-    website: "",
-    linkedin: "",
-  },
-  summary: "",
-  experience: [],
-  education: [],
-  skills: [],
-  projects: [],
-  certifications: [],
-};
+const emptyContent = emptyResumeContent();
 
 const emptyExperience = {
   id: "experience-1",
@@ -82,6 +67,7 @@ const stepFields: FieldPath<ResumeContentInput>[][] = [
     "personalInfo.headline",
     "personalInfo.email",
     "personalInfo.phone",
+    "personalInfo.address",
     "personalInfo.location",
     "personalInfo.website",
     "personalInfo.linkedin",
@@ -100,6 +86,8 @@ function Field({
   type = "text",
   placeholder,
   error,
+  textarea = false,
+  rows = 3,
 }: {
   label: string;
   name: FieldPath<ResumeContentInput>;
@@ -107,11 +95,17 @@ function Field({
   type?: string;
   placeholder?: string;
   error?: string;
+  textarea?: boolean;
+  rows?: number;
 }) {
   return (
     <label className="profile-field">
       <span>{label}</span>
-      <input type={type} placeholder={placeholder} aria-invalid={Boolean(error)} {...register(name)} />
+      {textarea ? (
+        <textarea rows={rows} placeholder={placeholder} aria-invalid={Boolean(error)} {...register(name)} />
+      ) : (
+        <input type={type} placeholder={placeholder} aria-invalid={Boolean(error)} {...register(name)} />
+      )}
       {error ? <small className="field-error">{error}</small> : null}
     </label>
   );
@@ -125,7 +119,7 @@ export function ProfileWizard() {
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const { control, register, reset, trigger, handleSubmit, getValues, formState: { errors } } = useForm<ResumeContentInput>({
+  const { control, register, reset, trigger, handleSubmit, watch, setValue, formState: { errors } } = useForm<ResumeContentInput>({
     defaultValues: emptyContent,
     resolver: zodResolver(resumeContentSchema),
     mode: "onBlur",
@@ -252,6 +246,7 @@ export function ProfileWizard() {
                 <Field label="Professional headline" name="personalInfo.headline" register={register} placeholder="Product designer" error={errors.personalInfo?.headline?.message} />
                 <Field label="Email" name="personalInfo.email" register={register} type="email" placeholder="alex@example.com" error={errors.personalInfo?.email?.message} />
                 <Field label="Phone" name="personalInfo.phone" register={register} placeholder="+1 555 000 0000" error={errors.personalInfo?.phone?.message} />
+                <Field label="Street address (optional)" name="personalInfo.address" register={register} placeholder="24 Garden Street" error={errors.personalInfo?.address?.message} />
                 <Field label="Location" name="personalInfo.location" register={register} placeholder="New York, NY" error={errors.personalInfo?.location?.message} />
                 <Field label="Website" name="personalInfo.website" register={register} placeholder="alexmorgan.com" error={errors.personalInfo?.website?.message} />
                 <Field label="LinkedIn" name="personalInfo.linkedin" register={register} placeholder="linkedin.com/in/alex" error={errors.personalInfo?.linkedin?.message} />
@@ -280,7 +275,7 @@ export function ProfileWizard() {
                       <Field label="Start" name={`experience.${index}.startDate`} register={register} placeholder="Jan 2022" />
                       <Field label="End" name={`experience.${index}.endDate`} register={register} placeholder="Present" />
                       <label className="profile-check"><input type="checkbox" {...register(`experience.${index}.current`)} /><span>I work here now</span></label>
-                      <label className="profile-field profile-field-wide"><span>Highlights, one per line</span><textarea rows={4} {...register(`experience.${index}.bullets.0`)} placeholder="Improved...&#10;Led..." /></label>
+                      <HighlightsField label="Highlights, one per line" path={`experience.${index}.bullets`} watch={watch} setValue={setValue} placeholder={"Improved...\nLed..."} />
                     </div>
                   </fieldset>
                 ))}
@@ -328,7 +323,7 @@ export function ProfileWizard() {
                       <Field label="GitHub link" name={`projects.${index}.url`} register={register} placeholder="github.com/your-name/project" />
                       <Field label="Live link" name={`projects.${index}.liveUrl`} register={register} placeholder="https://project.dev" />
                       <label className="profile-field profile-field-wide"><span>Description</span><textarea rows={3} {...register(`projects.${index}.description`)} /></label>
-                      <label className="profile-field profile-field-wide"><span>Technologies, comma separated</span><input defaultValue={field.technologies.join(", ")} placeholder="Figma, React, Notion" onChange={(event) => { const technologies = event.target.value.split(",").map((value) => value.trim()).filter(Boolean); const current = getValues(`projects.${index}`); projects.update(index, { ...current, technologies }); }} /></label>
+                      <label className="profile-field profile-field-wide"><span>Technologies, comma separated</span><input value={(watch(`projects.${index}.technologies`) ?? []).join(", ")} placeholder="Figma, React, Notion" onChange={(event) => { const technologies = event.target.value.split(",").map((value) => value.trim()).filter(Boolean); setValue(`projects.${index}.technologies`, technologies, { shouldDirty: true }); }} /></label>
                     </div>
                   </fieldset>
                 ))}
