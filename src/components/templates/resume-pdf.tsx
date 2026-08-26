@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
   bullets: { marginTop: 4, paddingLeft: 10, color: "#4d4e48", fontSize: 8, lineHeight: 1.45 },
   bulletModern: { paddingLeft: 0 },
   skillWrap: { flexDirection: "row", flexWrap: "wrap", alignItems: "flex-start", gap: 5 },
-  skill: { maxWidth: "100%", borderWidth: 1, borderColor: "#c8c8c0", padding: "4 5", color: "#4d4e48", fontSize: 7.5 },
+  skill: { maxWidth: "100%", borderWidth: 1, borderColor: "#c8c8c0", padding: "3 5", color: "#4d4e48", fontSize: 7.5, lineHeight: 1.2 },
   skillGroup: { marginBottom: 4, color: "#4d4e48", fontSize: 8 },
   // Harvard-specific entry styles
   harvardEntryTitle: { fontSize: 9.5, fontWeight: 700 },
@@ -188,13 +188,13 @@ function PdfSection({ section, content, variant, selection }: { section: Section
   if (section === "experience") {
     const ids = selectedEntryIds("experience", selection, content.experience.map((entry) => entry.id));
     const allowed = new Set(ids);
-    body = <View>{content.experience.filter((entry) => allowed.has(entry.id) && (entry.company || entry.role || entry.bullets.some(Boolean))).map((entry) => <View style={styles.entry} key={entry.id}>{variant === "harvard" ? <View><EntryHeading title={entry.company || "Company"} meta={entry.location} date={undefined} variant={variant} /><HarvardRoleLine role={entry.role || "Role"} date={[entry.startDate, entry.current ? "Present" : entry.endDate].filter(Boolean).join(" — ")} /></View> : <EntryHeading title={entry.role || "Role"} meta={[entry.company, entry.location].filter(Boolean).join(", ")} date={[entry.startDate, entry.current ? "Present" : entry.endDate].filter(Boolean).join(" — ")} variant={variant} />}{entry.bullets.filter(Boolean).length ? <View style={[styles.bullets, variant === "modern" ? styles.bulletModern : undefined]}>{entry.bullets.filter(Boolean).map((bullet, index) => <Text key={`${entry.id}-${index}`}>{marker}{bullet}</Text>)}</View> : null}</View>)}</View>;
+    body = <View>{content.experience.filter((entry) => allowed.has(entry.id) && (entry.company || entry.role || entry.bullets.some(Boolean))).map((entry) => <View style={styles.entry} key={entry.id}>{variant === "harvard" ? <View><EntryHeading title={entry.company || "Company"} meta={entry.location} date={undefined} variant={variant} /><HarvardRoleLine role={entry.role || "Role"} date={[entry.startDate, entry.current ? "Present" : entry.endDate].filter(Boolean).join(" — ")} /></View> : <EntryHeading title={entry.role || "Role"} meta={entry.company} date={[[entry.startDate, entry.current ? "Present" : entry.endDate].filter(Boolean).join(" — "), entry.location].filter(Boolean).join("\n")} variant={variant} />}{entry.bullets.filter(Boolean).length ? <View style={[styles.bullets, variant === "modern" ? styles.bulletModern : undefined]}>{entry.bullets.filter(Boolean).map((bullet, index) => <Text key={`${entry.id}-${index}`}>{marker}{bullet}</Text>)}</View> : null}</View>)}</View>;
   }
 
   if (section === "education") {
     const ids = selectedEntryIds("education", selection, content.education.map((entry) => entry.id));
     const allowed = new Set(ids);
-    body = <View>{content.education.filter((entry) => allowed.has(entry.id) && (entry.school || entry.degree || entry.field || entry.cgpa)).map((entry) => variant === "harvard" ? <HarvardEducationEntry entry={entry} key={entry.id} /> : <View style={styles.entry} key={entry.id}><EntryHeading title={entry.school || "Education"} meta={[[entry.degree, entry.field].filter(Boolean).join(", "), entry.location, entry.cgpa ? `CGPA ${entry.cgpa}` : ""].filter(Boolean).join(", ")} date={entry.endDate || entry.startDate} variant={variant} />{entry.thesis ? <Text style={styles.entryNote}><Text style={{ fontStyle: "italic" }}>Thesis:</Text> {entry.thesis}</Text> : null}{entry.coursework ? <Text style={styles.entryNote}><Text style={{ fontStyle: "italic" }}>Relevant Coursework:</Text> {entry.coursework}</Text> : null}</View>)}</View>;
+    body = <View>{content.education.filter((entry) => allowed.has(entry.id) && (entry.school || entry.degree || entry.field || entry.cgpa)).map((entry) => variant === "harvard" ? <HarvardEducationEntry entry={entry} key={entry.id} /> : <View style={styles.entry} key={entry.id}><EntryHeading title={entry.school || "Education"} meta={[entry.degree, entry.field].filter(Boolean).join(", ")} date={[entry.endDate || entry.startDate, entry.location].filter(Boolean).join("\n")} variant={variant} />{entry.cgpa ? <Text style={styles.entryNote}>CGPA {entry.cgpa}</Text> : null}{entry.thesis ? <Text style={styles.entryNote}><Text style={{ fontStyle: "italic" }}>Thesis:</Text> {entry.thesis}</Text> : null}{entry.coursework ? <Text style={styles.entryNote}><Text style={{ fontStyle: "italic" }}>Relevant Coursework:</Text> {entry.coursework}</Text> : null}</View>)}</View>;
   }
 
   if (section === "skills") {

@@ -1631,10 +1631,11 @@ body {
   max-width: 100%;
   overflow-wrap: anywhere;
   border: 1px solid #c8c8c0;
-  padding: 5px 7px;
+  padding: 4px 7px;
   color: #4d4e48;
   font-family: var(--font-geist-mono), monospace;
   font-size: 8px;
+  line-height: 1.2;
 }
 
 .resume-paper-harvard {

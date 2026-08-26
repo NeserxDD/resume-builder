@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { resumeContentSchema, emptyResumeContent } from "@/lib/resume/schema";
 import type { ResumeContentInput } from "@/lib/resume/schema";
 import { HighlightsField } from "@/components/resumes/highlights-field";
+import { TagListField } from "@/components/resumes/tag-list-field";
 
 const emptyContent = emptyResumeContent();
 
@@ -323,7 +324,7 @@ export function ProfileWizard() {
                       <Field label="GitHub link" name={`projects.${index}.url`} register={register} placeholder="github.com/your-name/project" />
                       <Field label="Live link" name={`projects.${index}.liveUrl`} register={register} placeholder="https://project.dev" />
                       <label className="profile-field profile-field-wide"><span>Description</span><textarea rows={3} {...register(`projects.${index}.description`)} /></label>
-                      <label className="profile-field profile-field-wide"><span>Technologies, comma separated</span><input value={(watch(`projects.${index}.technologies`) ?? []).join(", ")} placeholder="Figma, React, Notion" onChange={(event) => { const technologies = event.target.value.split(",").map((value) => value.trim()).filter(Boolean); setValue(`projects.${index}.technologies`, technologies, { shouldDirty: true }); }} /></label>
+                      <TagListField label="Technologies, comma separated" value={watch(`projects.${index}.technologies`) ?? []} placeholder="Figma, React, Notion" onCommit={(technologies) => setValue(`projects.${index}.technologies`, technologies, { shouldDirty: true })} />
                     </div>
                   </fieldset>
                 ))}

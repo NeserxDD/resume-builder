@@ -57,8 +57,8 @@ function ExperienceSection({ content, variant, selection }: { content: ResumeCon
       {entries.map((entry) => (
         <article className="resume-entry" key={entry.id}>
           <div className="resume-entry-heading">
-            <div><h3>{entry.role || "Role"}</h3><p>{entry.company}{entry.location ? `, ${entry.location}` : ""}</p></div>
-            <Dates start={entry.startDate} end={entry.endDate} current={entry.current} />
+            <div><h3>{entry.role || "Role"}</h3><p>{entry.company}</p></div>
+            <span>{[entry.startDate, entry.current ? "Present" : entry.endDate].filter(Boolean).join(" — ")}{entry.location ? <><br />{entry.location}</> : null}</span>
           </div>
           <BulletList bullets={entry.bullets} variant={variant} marker={marker} />
         </article>
@@ -116,7 +116,8 @@ function EducationSection({ content, variant, selection }: { content: ResumeCont
           <HarvardEducationEntry entry={entry} key={entry.id} />
         ) : (
           <article className="resume-entry" key={entry.id}>
-            <div className="resume-entry-heading"><div><h3>{entry.school || "School"}</h3><p>{[entry.degree, entry.field].filter(Boolean).join(", ")}{entry.location ? `, ${entry.location}` : ""}{entry.cgpa ? ` · CGPA ${entry.cgpa}` : ""}</p></div><span>{entry.endDate || entry.startDate}</span></div>
+            <div className="resume-entry-heading"><div><h3>{entry.school || "School"}</h3><p>{[entry.degree, entry.field].filter(Boolean).join(", ")}</p></div><span>{entry.endDate || entry.startDate}{entry.location ? <><br />{entry.location}</> : null}</span></div>
+            {entry.cgpa ? <p className="resume-entry-note">CGPA {entry.cgpa}</p> : null}
             {entry.thesis ? <p className="resume-entry-note"><em>Thesis:</em> {entry.thesis}</p> : null}
             {entry.coursework ? <p className="resume-entry-note"><em>Relevant Coursework:</em> {entry.coursework}</p> : null}
           </article>

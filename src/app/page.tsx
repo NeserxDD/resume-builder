@@ -241,10 +241,7 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="mx-auto flex max-w-7xl flex-col gap-4 border-t border-[var(--line)] px-6 py-7 font-mono text-[10px] uppercase tracking-[0.14em] text-[var(--ink-muted)] sm:flex-row sm:items-center sm:justify-between sm:px-10 lg:px-14">
-        <span>resume / builder</span>
-        <span>Make your work easier to see.</span>
-      </footer>
+
     </main>
   );
 }
