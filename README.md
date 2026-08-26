@@ -1,10 +1,14 @@
 # Resume Builder
 
+**Live showcase:** https://egdresumebuilder.vercel.app
+
 Resume Builder helps people create one reusable profile, then shape it into
 focused professional resumes. The current MVP foundation includes the Next.js
 app shell, Supabase auth boundaries, Prisma data model, profile wizard, resume
 CRUD with per-resume section/entry selection, seven template implementations,
 live screen previews, highlight-style options, and selectable-text PDF export.
+
+Built by **Ernes Glenn Dalope** — [Portfolio](https://ernesdalope.vercel.app) · [GitHub](https://github.com/NeserxDD/resume-builder) · [Email](mailto:ernesdalope02@gmail.com)
 
 Read [`PROJECT_PLAN.md`](./PROJECT_PLAN.md) for the product scope and agreed
 architecture decisions. Read [`AGENTS.md`](./AGENTS.md) for repository-specific
