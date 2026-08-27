@@ -28,7 +28,7 @@ export default function Home() {
         <div className="flex max-w-2xl flex-col justify-center">
           <p className="eyebrow mb-7">
             <span className="text-[var(--signal)]">01</span>
-            Your work, better arranged
+            Resume Builder — your work, better arranged
           </p>
           <h1 className="display-text max-w-3xl text-5xl leading-[0.96] tracking-[-0.065em] sm:text-7xl lg:text-[6.8rem]">
             One profile.
@@ -53,7 +53,7 @@ export default function Home() {
             </a>
           </div>
           <div className="mt-14 flex flex-wrap gap-x-8 gap-y-3 border-t border-[var(--line)] pt-5 font-mono text-[10px] uppercase tracking-[0.14em] text-[var(--ink-muted)]">
-            <span>3 focused layouts</span>
+            <span>Multiple layouts</span>
             <span>1 content set</span>
             <span>PDF-ready</span>
           </div>
@@ -203,6 +203,9 @@ export default function Home() {
               </div>
             </article>
           </div>
+            <p className="mt-6 text-center font-mono text-[10px] uppercase tracking-[0.14em] text-[var(--ink-muted)]">
+              Also: Classic Tech · Awesome CV · Two-Column (with photo)
+            </p>
         </div>
       </section>
 
