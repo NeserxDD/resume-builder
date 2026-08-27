@@ -4,7 +4,7 @@ export function SiteFooter() {
       <div className="mx-auto flex max-w-7xl flex-col gap-4 px-6 py-7 sm:flex-row sm:items-center sm:justify-between sm:px-10 lg:px-14">
         <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.14em] text-[var(--ink-muted)]">
           <span className="brand-mark" aria-hidden="true">
-            rb
+            EGD
           </span>
           <span>© 2026 Ernes Glenn Dalope</span>
         </div>

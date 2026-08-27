@@ -33,7 +33,7 @@ export default async function DashboardPage() {
     <main className="min-h-screen bg-[var(--paper)] px-6 py-6 text-[var(--ink)] sm:px-10 lg:px-14">
       <header className="mx-auto flex max-w-7xl items-center justify-between border-b border-[var(--line)] pb-6">
         <Link className="flex items-center gap-3" href="/">
-          <span className="brand-mark" aria-hidden="true">rb</span>
+          <span className="brand-mark" aria-hidden="true">EGD</span>
           <span className="font-mono text-[11px] font-medium uppercase tracking-[0.18em]">resume / builder</span>
         </Link>
         <SignOutButton />

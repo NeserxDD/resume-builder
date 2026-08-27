@@ -165,7 +165,7 @@ export function ResumeCreator() {
     <main className="profile-shell">
       <header className="profile-header">
         <Link className="flex items-center gap-3" href="/dashboard">
-          <span className="brand-mark" aria-hidden="true">rb</span>
+          <span className="brand-mark" aria-hidden="true">EGD</span>
           <span className="font-mono text-[11px] font-medium uppercase tracking-[0.18em]">resume / builder</span>
         </Link>
         <Link className="auth-back" href="/dashboard">← Dashboard</Link>

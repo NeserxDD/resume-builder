@@ -100,7 +100,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
         <div className="auth-layout">
           <section className="auth-intro">
             <p className="eyebrow">
-              <span className="text-[var(--signal)]">rb</span>
+              <span className="text-[var(--signal)]">EGD</span>
               {content.eyebrow}
             </p>
             <h1 className="display-text mt-8 text-5xl leading-[0.95] tracking-[-0.065em] sm:text-7xl">

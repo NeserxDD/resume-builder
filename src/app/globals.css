@@ -109,17 +109,16 @@ body {
 
 .brand-mark {
   display: inline-flex;
-  height: 28px;
-  width: 28px;
+  height: 32px;
+  width: 32px;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
   background: var(--ink);
   color: var(--paper);
   font-family: var(--font-geist-mono), monospace;
-  font-size: 10px;
-  letter-spacing: -0.12em;
-  padding-right: 2px;
+  font-size: 8.5px;
+  letter-spacing: 0.06em;
 }
 
 .nav-link {

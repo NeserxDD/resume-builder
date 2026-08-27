@@ -4,7 +4,7 @@ export default function Home() {
       <header className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-6 sm:px-10 lg:px-14">
         <a className="flex items-center gap-3" href="#top" aria-label="Resume Builder home">
           <span className="brand-mark" aria-hidden="true">
-            rb
+            EGD
           </span>
           <span className="font-mono text-[11px] font-medium uppercase tracking-[0.18em]">
             resume / builder
